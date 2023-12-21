@@ -31,7 +31,7 @@ const Login = () => {
     e.preventDefault();
     setErrorMessage(""); // Limpiar mensajes de error anteriores
     try {
-      const response = await axios.post(`${URL}/login`, { user, password }); // Asegúrate que URL es correcta
+      const response = await axios.post(`${URL}login`, { user, password }); // Asegúrate que URL es correcta
       const { token } = response.data;
 
       // Asegúrate que el token exista
