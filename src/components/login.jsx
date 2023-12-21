@@ -16,6 +16,7 @@ import {
   AlertIcon,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import jwtDecode from "jwt-decode";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -31,18 +32,17 @@ const Login = () => {
     setErrorMessage(""); // Limpiar mensajes de error anteriores
     try {
       const response = await axios.post(`${URL}login`, { user, password });
-      console.log("Respuesta del servidor:", response.data); // Solo para depuración
+      const { token } = response.data;
 
-      // Aquí asumimos que la respuesta incluye el userType
-      const { userType } = response.data;
+      const decodedToken = jwtDecode(token);
+      console.log("Token decodificado:", decodedToken);
 
-      if (userType === "admin") {
+      if (decodedToken.admin) {
         navigate("/admin");
-      } else if (userType === "coordinator") {
+      } else if (decodedToken.coordinator) {
         navigate("/coordinator");
       } else {
-        // Manejar casos donde userType no es ni 'admin' ni 'coordinator'
-        console.log("Tipo de usuario no reconocido:", userType);
+        console.log("Tipo de usuario no reconocido");
         setErrorMessage("Tipo de usuario no reconocido. Acceso denegado.");
       }
     } catch (error) {
