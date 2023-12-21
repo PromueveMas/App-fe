@@ -31,25 +31,35 @@ const Login = () => {
     e.preventDefault();
     setErrorMessage(""); // Limpiar mensajes de error anteriores
     try {
-      const response = await axios.post(`${URL}login`, { user, password });
+      const response = await axios.post(`${URL}/login`, { user, password }); // Asegúrate de que URL termine con '/'
       const { token } = response.data;
 
-      const decodedToken = jwtDecode.default(token);
+      // Verificar si el token existe antes de decodificar
+      if (token) {
+        const decodedToken = jwtDecode(token); // Modificado para usar jwtDecode directamente
+        console.log("Token decodificado:", decodedToken);
 
-      console.log("Token decodificado:", decodedToken);
-
-      if (decodedToken.admin) {
-        navigate("/admin");
-      } else if (decodedToken.coordinator) {
-        navigate("/coordinator");
+        if (decodedToken.admin) {
+          navigate("/admin");
+        } else if (decodedToken.coordinator) {
+          navigate("/coordinator");
+        } else {
+          console.log("Tipo de usuario no reconocido");
+          setErrorMessage("Tipo de usuario no reconocido. Acceso denegado.");
+        }
       } else {
-        console.log("Tipo de usuario no reconocido");
-        setErrorMessage("Tipo de usuario no reconocido. Acceso denegado.");
+        // Manejar el caso en que no haya token
+        console.log("No se recibió token del servidor");
+        setErrorMessage("Error en la autenticación. No se recibió token.");
       }
     } catch (error) {
-      console.error("Error de inicio de sesión:", error);
+      // Mejorado el manejo de errores para obtener más detalles
+      console.error("Error de inicio de sesión:", error.response || error);
       setErrorMessage(
-        "Error en el inicio de sesión. Por favor, inténtalo de nuevo."
+        "Error en el inicio de sesión: " +
+          (error.response
+            ? error.response.data
+            : "Por favor, inténtalo de nuevo.")
       );
     }
   };
