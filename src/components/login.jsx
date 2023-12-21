@@ -28,14 +28,13 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage(""); // Limpiar mensajes de error previos
+    setErrorMessage(""); // Limpiar mensajes de error anteriores
     try {
       const response = await axios.post(`${URL}login`, { user, password });
-      const { userType } = response.data; // Asume que el tipo de usuario viene en la respuesta
+      console.log("Respuesta del servidor:", response.data); // Solo para depuración
 
-      // Guardar el token si se devuelve uno
-      // const token = response.data.token;
-      // localStorage.setItem('token', token);
+      // Aquí asumimos que la respuesta incluye el userType
+      const { userType } = response.data;
 
       if (userType === "admin") {
         navigate("/admin");
