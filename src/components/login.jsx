@@ -40,6 +40,10 @@ const Login = () => {
         navigate("/admin");
       } else if (userType === "coordinator") {
         navigate("/coordinator");
+      } else {
+        // Manejar casos donde userType no es ni 'admin' ni 'coordinator'
+        console.log("Tipo de usuario no reconocido:", userType);
+        setErrorMessage("Tipo de usuario no reconocido. Acceso denegado.");
       }
     } catch (error) {
       console.error("Error de inicio de sesión:", error);
