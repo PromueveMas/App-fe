@@ -1,4 +1,3 @@
-// Login.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -13,6 +12,8 @@ import {
   InputGroup,
   InputRightElement,
   IconButton,
+  Alert,
+  AlertIcon,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
@@ -20,15 +21,21 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
   const handlePasswordVisibility = () => setShowPassword(!showPassword);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage(""); // Limpiar mensajes de error previos
     try {
       const response = await axios.post(`${URL}login`, { user, password });
       const { userType } = response.data; // Asume que el tipo de usuario viene en la respuesta
+
+      // Guardar el token si se devuelve uno
+      // const token = response.data.token;
+      // localStorage.setItem('token', token);
 
       if (userType === "admin") {
         navigate("/admin");
@@ -37,7 +44,9 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Error de inicio de sesión:", error);
-      // Manejar el error en la UI
+      setErrorMessage(
+        "Error en el inicio de sesión. Por favor, inténtalo de nuevo."
+      );
     }
   };
 
@@ -79,6 +88,12 @@ const Login = () => {
               </InputRightElement>
             </InputGroup>
           </FormControl>
+          {errorMessage && (
+            <Alert status="error">
+              <AlertIcon />
+              {errorMessage}
+            </Alert>
+          )}
           <Button type="submit" colorScheme="blue" width="full">
             Iniciar sesión
           </Button>
