@@ -16,7 +16,7 @@ import {
   AlertIcon,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import jwtDecode from "jwt-decode";
+import * as jwtDecode from "jwt-decode";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
