@@ -31,35 +31,30 @@ const Login = () => {
     e.preventDefault();
     setErrorMessage(""); // Limpiar mensajes de error anteriores
     try {
-      const response = await axios.post(`${URL}/login`, { user, password }); // Asegúrate de que URL termine con '/'
+      const response = await axios.post(`${URL}/login`, { user, password }); // Asegúrate que URL es correcta
       const { token } = response.data;
 
-      // Verificar si el token existe antes de decodificar
-      if (token) {
-        const decodedToken = jwtDecode(token); // Modificado para usar jwtDecode directamente
-        console.log("Token decodificado:", decodedToken);
+      // Asegúrate que el token exista
+      if (!token) {
+        throw new Error("No token received from server");
+      }
 
-        if (decodedToken.admin) {
-          navigate("/admin");
-        } else if (decodedToken.coordinator) {
-          navigate("/coordinator");
-        } else {
-          console.log("Tipo de usuario no reconocido");
-          setErrorMessage("Tipo de usuario no reconocido. Acceso denegado.");
-        }
+      const decodedToken = jwtDecode(token); // Uso directo de jwtDecode
+      console.log("Token decodificado:", decodedToken);
+
+      // Redirección basada en roles
+      if (decodedToken.admin) {
+        navigate("/admin");
+      } else if (decodedToken.coordinator) {
+        navigate("/coordinator");
       } else {
-        // Manejar el caso en que no haya token
-        console.log("No se recibió token del servidor");
-        setErrorMessage("Error en la autenticación. No se recibió token.");
+        throw new Error("Tipo de usuario no reconocido. Acceso denegado.");
       }
     } catch (error) {
-      // Mejorado el manejo de errores para obtener más detalles
-      console.error("Error de inicio de sesión:", error.response || error);
+      console.error("Error de inicio de sesión:", error);
       setErrorMessage(
-        "Error en el inicio de sesión: " +
-          (error.response
-            ? error.response.data
-            : "Por favor, inténtalo de nuevo.")
+        error.message ||
+          "Error en el inicio de sesión. Por favor, inténtalo de nuevo."
       );
     }
   };
