@@ -34,7 +34,8 @@ const Login = () => {
       const response = await axios.post(`${URL}login`, { user, password });
       const { token } = response.data;
 
-      const decodedToken = jwtDecode(token);
+      const decodedToken = jwtDecode.default(token);
+
       console.log("Token decodificado:", decodedToken);
 
       if (decodedToken.admin) {
