@@ -1,4 +1,3 @@
-// AdminEmployee.js
 import { useState } from "react";
 import {
   Box,
@@ -17,8 +16,8 @@ import {
 } from "@chakra-ui/react";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import UpdateEmployeeModal from "../modals/UpdateEmployeeModal.jsx"; // Asegúrate de que la ruta sea correcta
-import DeleteEmployeeModal from "../modals/DeleteEmployeeModal.jsx"; // Asegúrate de que la ruta sea correcta
+import UpdateEmployeeModal from "../modals/UpdateEmployeeModal";
+import DeleteEmployeeModal from "../modals/DeleteEmployeeModal";
 
 const AdminEmployee = () => {
   const navigate = useNavigate();
@@ -34,6 +33,8 @@ const AdminEmployee = () => {
       identification: "123456",
       position: "Administrador",
       nPhone: "3111111111",
+      username: "juanf",
+      password: "password123",
     },
     {
       id: 2,
@@ -42,16 +43,21 @@ const AdminEmployee = () => {
       identification: "12323456",
       position: "Coordinador",
       nPhone: "3111111113",
+      username: "pepitop",
+      password: "password234",
     },
     {
-      id: 2,
+      id: 3,
       name: "Dan",
       lastName: "Joe",
       identification: "12334456",
       position: "Administrador",
       nPhone: "3111111112",
+      username: "danj",
+      password: "password345",
     },
   ]);
+
   const [isUpdateModalOpen, setUpdateModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -71,7 +77,6 @@ const AdminEmployee = () => {
   const closeDeleteModal = () => setDeleteModalOpen(false);
 
   const updateEmployee = (updatedEmployee) => {
-    // Lógica para actualizar el empleado
     setEmployees(
       employees.map((emp) =>
         emp.id === updatedEmployee.id ? updatedEmployee : emp
@@ -80,14 +85,13 @@ const AdminEmployee = () => {
   };
 
   const deleteEmployee = (employeeToDelete) => {
-    // Lógica para eliminar el empleado
     setEmployees(employees.filter((emp) => emp.id !== employeeToDelete.id));
   };
 
   return (
     <Box
       p={4}
-      width="900px"
+      width="1000px"
       borderWidth="1px"
       borderRadius="lg"
       boxShadow="lg"
@@ -118,6 +122,7 @@ const AdminEmployee = () => {
             <Th>No. Identificación</Th>
             <Th>Cargo</Th>
             <Th>Celular</Th>
+            <Th>Usuario</Th>
             <Th>Acciones</Th>
           </Tr>
         </Thead>
@@ -129,6 +134,7 @@ const AdminEmployee = () => {
               <Td>{employee.identification}</Td>
               <Td>{employee.position}</Td>
               <Td>{employee.nPhone}</Td>
+              <Td>{employee.username}</Td>
               <Td>
                 <IconButton
                   aria-label="Editar"

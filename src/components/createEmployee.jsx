@@ -9,7 +9,7 @@ import {
   useColorModeValue,
   RadioGroup,
   Radio,
-  HStack, // Agregamos HStack
+  HStack,
 } from "@chakra-ui/react";
 import { useState } from "react";
 
@@ -19,6 +19,8 @@ const CreateEmployee = () => {
   const [identification, setIdentification] = useState("");
   const [role, setRole] = useState("");
   const [phone, setPhone] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -29,6 +31,8 @@ const CreateEmployee = () => {
       identification,
       role,
       phone,
+      username,
+      password,
     });
   };
 
@@ -82,8 +86,6 @@ const CreateEmployee = () => {
               onChange={(nextRole) => setRole(nextRole)}
             >
               <HStack spacing={4}>
-                {" "}
-                {/* Usamos HStack para alinear los radio buttons en línea */}
                 <Radio value="admin">Admin</Radio>
                 <Radio value="coordinador">Coordinador</Radio>
               </HStack>
@@ -95,6 +97,22 @@ const CreateEmployee = () => {
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
+            />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>USUARIO</FormLabel>
+            <Input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>CONTRASEÑA</FormLabel>
+            <Input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </FormControl>
           <Button type="submit" colorScheme="teal" size="lg" isFullWidth>

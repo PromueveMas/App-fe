@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "proxy": "https://stellar-griffin-00b205.netlify.app",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

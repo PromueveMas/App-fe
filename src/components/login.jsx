@@ -1,3 +1,8 @@
+// Login.jsx
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { URL } from "../utils/constants";
 import {
   Box,
   Button,
@@ -9,27 +14,31 @@ import {
   InputRightElement,
   IconButton,
 } from "@chakra-ui/react";
-import { useState } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
-import { URL } from "../utils/constants";
-import axios from "axios";
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handlePasswordVisibility = () => setShowPassword(!showPassword);
 
-  const handleSubmit = async () => {
-    const service = `${URL}login`;
-    const body = {
-      user,
-      password,
-    };
-    const response = await axios.post(service, body);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(`${URL}login`, { user, password });
+      const { userType } = response.data; // Asume que el tipo de usuario viene en la respuesta
 
-    console.log("RSPONSE: ", response);
+      if (userType === "admin") {
+        navigate("/admin");
+      } else if (userType === "coordinator") {
+        navigate("/coordinator");
+      }
+    } catch (error) {
+      console.error("Error de inicio de sesión:", error);
+      // Manejar el error en la UI
+    }
   };
 
   return (
@@ -41,40 +50,40 @@ const Login = () => {
       boxShadow="lg"
       bg="white"
     >
-      <VStack spacing="4">
-        <FormControl id="user">
-          <FormLabel>User</FormLabel>
-          <Input
-            type="text"
-            value={user}
-            onChange={(e) => setUser(e.target.value)}
-          />
-        </FormControl>
-
-        <FormControl id="password">
-          <FormLabel>Password</FormLabel>
-          <InputGroup>
+      <form onSubmit={handleSubmit}>
+        <VStack spacing="4">
+          <FormControl id="user" isRequired>
+            <FormLabel>Usuario</FormLabel>
             <Input
-              type={showPassword ? "text" : "password"}
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              type="text"
+              value={user}
+              onChange={(e) => setUser(e.target.value)}
             />
-            <InputRightElement h="full">
-              <IconButton
-                aria-label={showPassword ? "Hide password" : "Show password"}
-                icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
-                onClick={handlePasswordVisibility}
-                variant="ghost"
+          </FormControl>
+          <FormControl id="password" isRequired>
+            <FormLabel>Contraseña</FormLabel>
+            <InputGroup>
+              <Input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
-            </InputRightElement>
-          </InputGroup>
-        </FormControl>
-
-        <Button colorScheme="blue" width="full" onClick={handleSubmit}>
-          Login
-        </Button>
-      </VStack>
+              <InputRightElement h="full">
+                <IconButton
+                  aria-label={
+                    showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                  }
+                  icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
+                  onClick={handlePasswordVisibility}
+                />
+              </InputRightElement>
+            </InputGroup>
+          </FormControl>
+          <Button type="submit" colorScheme="blue" width="full">
+            Iniciar sesión
+          </Button>
+        </VStack>
+      </form>
     </Box>
   );
 };

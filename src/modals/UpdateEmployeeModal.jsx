@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -11,26 +11,26 @@ import {
   FormControl,
   FormLabel,
   Input,
-  RadioGroup,
-  HStack,
-  Radio,
+  InputGroup,
+  InputRightElement,
+  IconButton,
 } from "@chakra-ui/react";
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import PropTypes from "prop-types";
 
 const UpdateEmployeeModal = ({ isOpen, onClose, employee, updateEmployee }) => {
-  const [updatedEmployee, setUpdatedEmployee] = React.useState(employee);
+  const [updatedEmployee, setUpdatedEmployee] = useState(employee);
+  const [showPassword, setShowPassword] = useState(false);
 
   React.useEffect(() => {
     setUpdatedEmployee(employee);
   }, [employee]);
 
+  const handlePasswordVisibility = () => setShowPassword(!showPassword);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUpdatedEmployee({ ...updatedEmployee, [name]: value });
-  };
-
-  const handleRoleChange = (nextRole) => {
-    setUpdatedEmployee({ ...updatedEmployee, position: nextRole });
   };
 
   const handleSubmit = () => {
@@ -72,18 +72,14 @@ const UpdateEmployeeModal = ({ isOpen, onClose, employee, updateEmployee }) => {
               onChange={handleChange}
             />
           </FormControl>
-          <FormControl isRequired>
+          <FormControl mt={4}>
             <FormLabel>Cargo</FormLabel>
-            <RadioGroup
-              colorScheme="blue"
-              value={updatedEmployee.position}
-              onChange={handleRoleChange}
-            >
-              <HStack spacing={4}>
-                <Radio value="Admin">Admin</Radio>
-                <Radio value="Coordinador">Coordinador</Radio>
-              </HStack>
-            </RadioGroup>
+            <Input
+              name="position"
+              placeholder="Cargo"
+              value={updatedEmployee?.position}
+              onChange={handleChange}
+            />
           </FormControl>
           <FormControl mt={4}>
             <FormLabel>Celular</FormLabel>
@@ -93,6 +89,34 @@ const UpdateEmployeeModal = ({ isOpen, onClose, employee, updateEmployee }) => {
               value={updatedEmployee?.nPhone}
               onChange={handleChange}
             />
+          </FormControl>
+          <FormControl mt={4}>
+            <FormLabel>Usuario</FormLabel>
+            <Input
+              name="username"
+              placeholder="Usuario"
+              value={updatedEmployee?.username}
+              onChange={handleChange}
+            />
+          </FormControl>
+          <FormControl mt={4}>
+            <FormLabel>Contraseña</FormLabel>
+            <InputGroup>
+              <Input
+                name="password"
+                placeholder="Contraseña"
+                type={showPassword ? "text" : "password"}
+                value={updatedEmployee?.password}
+                onChange={handleChange}
+              />
+              <InputRightElement>
+                <IconButton
+                  icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
+                  onClick={handlePasswordVisibility}
+                  variant="unstyled"
+                />
+              </InputRightElement>
+            </InputGroup>
           </FormControl>
         </ModalBody>
         <ModalFooter>
@@ -116,6 +140,8 @@ UpdateEmployeeModal.propTypes = {
     identification: PropTypes.string,
     position: PropTypes.string,
     nPhone: PropTypes.string,
+    username: PropTypes.string,
+    password: PropTypes.string,
   }),
   updateEmployee: PropTypes.func.isRequired,
 };
