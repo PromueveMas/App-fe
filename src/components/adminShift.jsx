@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Box,
   Table,
@@ -9,33 +10,64 @@ import {
   Text,
   Button,
   Icon,
+  Spinner,
+  Center,
 } from "@chakra-ui/react";
 import { FaEye } from "react-icons/fa";
+import axios from "axios";
+import { URL } from "../utils/constants";
+import { useNavigate } from "react-router-dom";
 
 const AdminShift = () => {
-  // Datos estáticos para la demostración
-  const shifts = [
-    { id: 1, date: "23/10/2023", group: "Grupo A", coordinator: "Ana Gómez" },
-    { id: 2, date: "24/10/2023", group: "Grupo B", coordinator: "Luis Ramos" },
-    // ... más turnos
-  ];
+  const [shifts, setShifts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const data = JSON.parse(localStorage.getItem("data"));
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchShifts = async () => {
+      try {
+        const headers = {
+          authorization: data.token,
+        };
+        const response = await axios.get(`${URL}/getShifts`, { headers });
+        console.log("SHIFTS: ", response);
+        setShifts(response.data);
+      } catch (error) {
+        console.error("Error al obtener los turnos:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchShifts();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <Center p="8">
+        <Spinner size="xl" />
+      </Center>
+    );
+  }
 
   return (
     <Box
-      p="8"
+      p="15"
       maxWidth="800px"
       borderWidth="1px"
       borderRadius="lg"
       boxShadow="lg"
       bg="white"
     >
-      <Text fontSize="2xl" mb="4">
-        Turnos Registrados
+      <Text fontSize="2xl" fontWeight="bold" mb={10}>
+        Panel de Control
       </Text>
       <Table variant="simple">
         <Thead>
           <Tr>
             <Th>Fecha</Th>
+            <Th>Hora</Th>
             <Th>Grupo</Th>
             <Th>Coordinador</Th>
             <Th>Acciones</Th>
@@ -43,12 +75,18 @@ const AdminShift = () => {
         </Thead>
         <Tbody>
           {shifts.map((shift) => (
-            <Tr key={shift.id}>
+            <Tr key={shift._id}>
               <Td>{shift.date}</Td>
+              <Td>{shift.hour}</Td>
               <Td>{shift.group}</Td>
-              <Td>{shift.coordinator}</Td>
+              <Td>{shift.coordinatorName}</Td>
               <Td>
-                <Button size="sm" mr="2" leftIcon={<Icon as={FaEye} />}>
+                <Button
+                  size="sm"
+                  mr="2"
+                  onClick={() => navigate(`/admin-shift/${shift._id}`)}
+                  leftIcon={<Icon as={FaEye} />}
+                >
                   Ver
                 </Button>
               </Td>

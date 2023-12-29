@@ -1,4 +1,3 @@
-import { Center } from "@chakra-ui/react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 // Importa tus componentes de página
@@ -9,27 +8,39 @@ import AdminEmployee from "./components/adminEmployee";
 import AdminShift from "./components/adminShift";
 import CoordinatorShift from "./components/coordinatorShift";
 import CreateEmployee from "./components/createEmployee";
+import SeeShift from "./components/seeShift";
+import LayoutWithHeader from "./components/layoutWithHeader";
+import { Center } from "@chakra-ui/react";
 
 const App = () => {
   return (
     <Router>
-      <Center minHeight="100vh">
-        <Routes>
-          {/* Route for the login page */}
-          <Route path="/" element={<Login />} />
-          {/* Route for the admin panel */}
-          <Route path="/admin" element={<Admin />} />
+      {" "}
+      <Routes>
+        {/* Ruta para la página de inicio de sesión sin el encabezado */}
+        <Route
+          path="/"
+          element={
+            <Center minHeight="100vh">
+              <Login />
+            </Center>
+          }
+        />
 
-          {/* Route for the admin workers management page */}
+        {/* Rutas que utilizarán el LayoutWithHeader */}
+        <Route element={<LayoutWithHeader />}>
+          {/* Ruta para el panel de administración */}
+          <Route path="/admin" element={<Admin />} />
+          {/* Ruta para la gestión de empleados de administración */}
           <Route path="/admin-employee" element={<AdminEmployee />} />
           <Route path="/admin-shift" element={<AdminShift />} />
           <Route path="/create-employee" element={<CreateEmployee />} />
-
-          {/* Define routes for other components here */}
+          {/* Definir rutas para otros componentes aquí */}
           <Route path="/coordinator" element={<Coordinator />} />
           <Route path="/coordinator-shift" element={<CoordinatorShift />} />
-        </Routes>
-      </Center>
+          <Route path="/admin-shift/:shiftId" element={<SeeShift />} />
+        </Route>
+      </Routes>
     </Router>
   );
 };

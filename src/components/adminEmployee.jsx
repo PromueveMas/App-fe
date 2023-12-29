@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -13,80 +13,116 @@ import {
   Spacer,
   IconButton,
   useColorModeValue,
+  Spinner,
+  Center,
 } from "@chakra-ui/react";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import UpdateEmployeeModal from "../modals/UpdateEmployeeModal";
 import DeleteEmployeeModal from "../modals/DeleteEmployeeModal";
+import axios from "axios";
+import { URL } from "../utils/constants";
 
 const AdminEmployee = () => {
   const navigate = useNavigate();
   const cardBg = useColorModeValue("white", "gray.800");
+  const data = JSON.parse(localStorage.getItem("data"));
 
   const createEmployee = () => navigate("/create-employee");
+  const [employees, setEmployees] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [reloadUpdate, setReloadUpdate] = useState(false);
 
-  const [employees, setEmployees] = useState([
-    {
-      id: 1,
-      name: "Juan",
-      lastName: "Florez",
-      identification: "123456",
-      position: "Administrador",
-      nPhone: "3111111111",
-      username: "juanf",
-      password: "password123",
-    },
-    {
-      id: 2,
-      name: "Pepito",
-      lastName: "Perez",
-      identification: "12323456",
-      position: "Coordinador",
-      nPhone: "3111111113",
-      username: "pepitop",
-      password: "password234",
-    },
-    {
-      id: 3,
-      name: "Dan",
-      lastName: "Joe",
-      identification: "12334456",
-      position: "Administrador",
-      nPhone: "3111111112",
-      username: "danj",
-      password: "password345",
-    },
-  ]);
+  const headers = {
+    authorization: data.token,
+  };
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const response = await axios.get(`${URL}/getUsers`, { headers });
+        console.log("employees: ", response);
+        setEmployees(response.data);
+      } catch (error) {
+        console.error("Error al obtener los turnos:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEmployees();
+  }, [reloadUpdate]);
 
   const [isUpdateModalOpen, setUpdateModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
-  const openUpdateModal = (employee) => {
-    setSelectedEmployee(employee);
+  const openUpdateModal = async (employee) => {
+    const response = await axios.get(`${URL}/getUsers?id=${employee._id}`, {
+      headers,
+    });
+
+    setSelectedEmployee(response.data[0]);
     setUpdateModalOpen(true);
   };
 
   const closeUpdateModal = () => setUpdateModalOpen(false);
 
-  const openDeleteModal = (employee) => {
-    setSelectedEmployee(employee);
+  const openDeleteModal = async (employee) => {
+    console.log("*** DELETE MODAL ***", employee);
+    const response = await axios.get(`${URL}/getUsers?id=${employee._id}`, {
+      headers,
+    });
+
+    console.log("RES ======", response.data[0]);
+    setSelectedEmployee(response.data[0]);
     setDeleteModalOpen(true);
   };
 
   const closeDeleteModal = () => setDeleteModalOpen(false);
 
-  const updateEmployee = (updatedEmployee) => {
-    setEmployees(
-      employees.map((emp) =>
-        emp.id === updatedEmployee.id ? updatedEmployee : emp
-      )
+  const updateEmployee = async (updatedEmployee) => {
+    setReloadUpdate(false);
+
+    const response = await axios.put(
+      `${URL}/updateUsers?id=${updatedEmployee._id}`,
+      updatedEmployee,
+      {
+        headers,
+      }
     );
+
+    if (response.status == 200) {
+      setReloadUpdate(true);
+      setIsLoading(true);
+    }
   };
 
-  const deleteEmployee = (employeeToDelete) => {
-    setEmployees(employees.filter((emp) => emp.id !== employeeToDelete.id));
+  const deleteEmployee = async () => {
+    console.log("EMPLOTEE TO DELETE: ", selectedEmployee);
+    setReloadUpdate(false);
+
+    const response = await axios.delete(
+      `${URL}/deleteUsers?id=${selectedEmployee._id}`,
+      {
+        headers,
+      }
+    );
+
+    if (response.status == 200) {
+      setReloadUpdate(true);
+      setIsLoading(true);
+      closeDeleteModal();
+    }
   };
+
+  if (isLoading) {
+    return (
+      <Center p="8">
+        <Spinner size="xl" />
+      </Center>
+    );
+  }
 
   return (
     <Box
@@ -117,8 +153,7 @@ const AdminEmployee = () => {
       <Table variant="simple">
         <Thead>
           <Tr>
-            <Th>Nombre(s)</Th>
-            <Th>Apellidos</Th>
+            <Th>Nombre</Th>
             <Th>No. Identificación</Th>
             <Th>Cargo</Th>
             <Th>Celular</Th>
@@ -128,13 +163,14 @@ const AdminEmployee = () => {
         </Thead>
         <Tbody>
           {employees.map((employee) => (
-            <Tr key={employee.id}>
-              <Td>{employee.name}</Td>
-              <Td>{employee.lastName}</Td>
-              <Td>{employee.identification}</Td>
-              <Td>{employee.position}</Td>
-              <Td>{employee.nPhone}</Td>
-              <Td>{employee.username}</Td>
+            <Tr key={employee._id}>
+              <Td>{employee.fullName}</Td>
+              <Td>{employee.identification ? employee.identification : "-"}</Td>
+              <Td>
+                {employee.admin === "true" ? "Administrador" : "Coordinador"}
+              </Td>
+              <Td>{employee.phone}</Td>
+              <Td>{employee.user}</Td>
               <Td>
                 <IconButton
                   aria-label="Editar"

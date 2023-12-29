@@ -48,18 +48,9 @@ const UpdateEmployeeModal = ({ isOpen, onClose, employee, updateEmployee }) => {
           <FormControl>
             <FormLabel>Nombre</FormLabel>
             <Input
-              name="name"
+              name="fullName"
               placeholder="Nombre"
-              value={updatedEmployee?.name}
-              onChange={handleChange}
-            />
-          </FormControl>
-          <FormControl mt={4}>
-            <FormLabel>Apellido</FormLabel>
-            <Input
-              name="lastName"
-              placeholder="Apellido"
-              value={updatedEmployee?.lastName}
+              value={updatedEmployee?.fullName}
               onChange={handleChange}
             />
           </FormControl>
@@ -75,27 +66,29 @@ const UpdateEmployeeModal = ({ isOpen, onClose, employee, updateEmployee }) => {
           <FormControl mt={4}>
             <FormLabel>Cargo</FormLabel>
             <Input
-              name="position"
+              name="rol"
               placeholder="Cargo"
-              value={updatedEmployee?.position}
+              value={
+                updatedEmployee?.admin === "true" ? "admin" : "coordinator"
+              }
               onChange={handleChange}
             />
           </FormControl>
           <FormControl mt={4}>
             <FormLabel>Celular</FormLabel>
             <Input
-              name="nPhone"
+              name="phone"
               placeholder="Celular"
-              value={updatedEmployee?.nPhone}
+              value={updatedEmployee?.phone}
               onChange={handleChange}
             />
           </FormControl>
           <FormControl mt={4}>
             <FormLabel>Usuario</FormLabel>
             <Input
-              name="username"
+              name="user"
               placeholder="Usuario"
-              value={updatedEmployee?.username}
+              value={updatedEmployee?.user}
               onChange={handleChange}
             />
           </FormControl>

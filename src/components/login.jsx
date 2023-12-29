@@ -1,3 +1,7 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { URL } from "../utils/constants";
 import {
   Box,
   Button,
@@ -8,28 +12,50 @@ import {
   InputGroup,
   InputRightElement,
   IconButton,
+  Alert,
+  AlertIcon,
+  Image,
 } from "@chakra-ui/react";
-import { useState } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import logo from "./images/LOGO PROMUEVE+Cortado.png";
 
-import { URL } from "../utils/constants";
-import axios from "axios";
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
 
   const handlePasswordVisibility = () => setShowPassword(!showPassword);
 
-  const handleSubmit = async () => {
-    const service = `${URL}login`;
-    const body = {
-      user,
-      password,
-    };
-    const response = await axios.post(service, body);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMessage(""); // Limpiar mensajes de error anteriores
+    try {
+      const response = await axios.post(`${URL}/login`, { user, password }); // Asegúrate que URL es correcta
+      const { data, status } = response;
 
-    console.log("RSPONSE: ", response);
+      localStorage.setItem("data", JSON.stringify(data));
+
+      if (status != 200) {
+        setErrorMessage("Tipo de usuario no reconocido. Acceso denegado.");
+      }
+
+      const rol =
+        data.payload.admin === "true"
+          ? "admin"
+          : data.payload.coordinator === "true"
+          ? "coordinator"
+          : "";
+
+      rol === "admin" ? navigate("/admin") : navigate("/coordinator");
+    } catch (error) {
+      console.error("Error de inicio de sesión:", error);
+      setErrorMessage(
+        error.message ||
+          "Error en el inicio de sesión. Por favor, inténtalo de nuevo."
+      );
+    }
   };
 
   return (
@@ -41,40 +67,50 @@ const Login = () => {
       boxShadow="lg"
       bg="white"
     >
-      <VStack spacing="4">
-        <FormControl id="user">
-          <FormLabel>User</FormLabel>
-          <Input
-            type="text"
-            value={user}
-            onChange={(e) => setUser(e.target.value)}
-          />
-        </FormControl>
-
-        <FormControl id="password">
-          <FormLabel>Password</FormLabel>
-          <InputGroup>
+      <Box mb="8">
+        {" "}
+        <Image src={logo} alt="Logo" />
+      </Box>
+      <form onSubmit={handleSubmit}>
+        <VStack spacing="4">
+          <FormControl id="user" isRequired>
+            <FormLabel>Usuario</FormLabel>
             <Input
-              type={showPassword ? "text" : "password"}
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              type="text"
+              value={user}
+              onChange={(e) => setUser(e.target.value)}
             />
-            <InputRightElement h="full">
-              <IconButton
-                aria-label={showPassword ? "Hide password" : "Show password"}
-                icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
-                onClick={handlePasswordVisibility}
-                variant="ghost"
+          </FormControl>
+          <FormControl id="password" isRequired>
+            <FormLabel>Contraseña</FormLabel>
+            <InputGroup>
+              <Input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
-            </InputRightElement>
-          </InputGroup>
-        </FormControl>
-
-        <Button colorScheme="blue" width="full" onClick={handleSubmit}>
-          Login
-        </Button>
-      </VStack>
+              <InputRightElement h="full">
+                <IconButton
+                  aria-label={
+                    showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                  }
+                  icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
+                  onClick={handlePasswordVisibility}
+                />
+              </InputRightElement>
+            </InputGroup>
+          </FormControl>
+          {errorMessage && (
+            <Alert status="error">
+              <AlertIcon />
+              {errorMessage}
+            </Alert>
+          )}
+          <Button type="submit" colorScheme="blue" width="full">
+            Iniciar sesión
+          </Button>
+        </VStack>
+      </form>
     </Box>
   );
 };

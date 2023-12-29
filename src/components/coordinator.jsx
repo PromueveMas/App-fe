@@ -7,33 +7,32 @@ const Coordinator = () => {
   const cardBg = useColorModeValue("white", "gray.800");
 
   const goToAgreeShift = () => navigate("/coordinator-shift");
-
   return (
-    <Box
-      textAlign="center"
-      p={10}
-      width="400px"
-      borderWidth="1px"
-      borderRadius="lg"
-      boxShadow="lg"
-      bg={cardBg}
-      m="auto"
-      mt="20vh"
-    >
-      <Text fontSize="2xl" fontWeight="bold" pb={10}>
-        Panel de Control
-      </Text>
-      <Button
-        leftIcon={<FaPlus />}
-        colorScheme="teal"
-        variant="solid"
-        size="lg"
-        shadow="md"
-        onClick={goToAgreeShift}
+    <>
+      <Box
+        textAlign="center"
+        p={10}
+        width="400px"
+        borderWidth="1px"
+        borderRadius="lg"
+        boxShadow="lg"
+        bg={cardBg}
       >
-        Agregar Registro de Turno
-      </Button>
-    </Box>
+        <Text fontSize="2xl" fontWeight="bold" pb={10}>
+          Panel de Control
+        </Text>
+        <Button
+          leftIcon={<FaPlus />}
+          colorScheme="teal"
+          variant="solid"
+          size="lg"
+          shadow="md"
+          onClick={goToAgreeShift}
+        >
+          Agregar Registro de Turno
+        </Button>
+      </Box>
+    </>
   );
 };
 

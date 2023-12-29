@@ -12,6 +12,10 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import axios from "axios";
+import { URL } from "../utils/constants";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const CreateEmployee = () => {
   const [firstName, setFirstName] = useState("");
@@ -21,19 +25,37 @@ const CreateEmployee = () => {
   const [phone, setPhone] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const data = JSON.parse(localStorage.getItem("data"));
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aquí iría la lógica para enviar estos datos a tu back-end
-    console.log({
-      firstName,
-      lastName,
+    const body = {
+      fullName: `${firstName} ${lastName}`,
       identification,
-      role,
+      admin: role === "admin" ? "true" : "false",
+      coordinator: role === "coordinador" ? "true" : "false",
       phone,
-      username,
+      user: username,
       password,
+    };
+
+    const headers = {
+      authorization: data.token,
+    };
+    const response = await axios.post(`${URL}/saveUser`, body, {
+      headers,
     });
+    if (response.status == 201) {
+      navigate("/admin-employee");
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Creación exitosa",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
   };
 
   const cardBg = useColorModeValue("white", "gray.800");

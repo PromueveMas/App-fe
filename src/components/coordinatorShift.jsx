@@ -8,31 +8,66 @@ import {
   Textarea,
   VStack,
   useColorModeValue,
-  Select, // Importamos Select
+  Select,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
+import axios from "axios";
+import { URL } from "../utils/constants";
+import Swal from "sweetalert2";
 
 const CoordinatorShift = () => {
+  const data = JSON.parse(localStorage.getItem("data"));
+
   const cardBg = useColorModeValue("white", "gray.800");
 
-  const [coordinatorName, setCoordinatorName] = useState("");
+  const [coordinatorName, setCoordinatorName] = useState(data.payload.name);
   const [zone, setZone] = useState("");
   const [group, setGroup] = useState("");
   const [date, setDate] = useState("");
   const [hour, setHour] = useState("");
   const [observations, setObservations] = useState("");
+  const [imageBase64, setImageBase64] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({
+    const body = {
       coordinatorName,
       zone,
       group,
       date,
       hour,
       observations,
+      imageBase64,
+    };
+
+    const headers = {
+      authorization: data.token,
+    };
+    const response = await axios.post(`${URL}/saveShift`, body, {
+      headers,
     });
+    if (response.status == 201) {
+      setCoordinatorName("");
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Creación exitosa",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageBase64(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   // Opciones de Zona y Grupos
@@ -130,6 +165,10 @@ const CoordinatorShift = () => {
             value={hour}
             onChange={(e) => setHour(e.target.value)}
           />
+        </FormControl>
+        <FormControl>
+          <FormLabel>Imagen</FormLabel>
+          <Input type="file" accept="image/*" onChange={handleImageChange} />
         </FormControl>
         <FormControl>
           <FormLabel>Observaciones</FormLabel>
